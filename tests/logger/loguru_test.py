@@ -16,7 +16,8 @@ class TestLoguruLogger:
     def loguru_logger(self) -> LoguruLogger:
         """Create a LoguruLogger instance for testing.
 
-        :return: Configured LoguruLogger instance
+        Returns:
+             Configured LoguruLogger instance
         """
         return LoguruLogger(level=LogLevel.DEBUG)
 
@@ -24,7 +25,8 @@ class TestLoguruLogger:
     def capture_logs(self) -> io.StringIO:
         """Capture logs output to a string buffer.
 
-        :yield: StringIO buffer containing log output
+        Yields:
+            StringIO buffer containing log output
         """
         log_stream = io.StringIO()
         logger.remove()
@@ -52,11 +54,12 @@ class TestLoguruLogger:
     ) -> None:
         """Test all logging levels with various message/context combinations.
 
-        :param loguru_logger: Logger instance
-        :param capture_logs: String buffer capturing log output
-        :param level: Log level to test
-        :param message: Message to log
-        :param context: Optional context dictionary
+        Args:
+            loguru_logger: Logger instance
+            capture_logs: String buffer capturing log output
+            level: Log level to test
+            message: Message to log
+            context: Optional context dictionary
         """
         # Get logging method dynamically
         log_method = getattr(loguru_logger, level)
@@ -82,7 +85,7 @@ class TestLoguruLogger:
     ) -> None:
         """Test exception logging with context.
 
-        :asserting:
+        The test verifies that:
             - Exception message is properly logged
             - Exception type is included
             - Additional context is preserved

@@ -16,6 +16,7 @@ from src.logger.contract import LoggerContract
 def mock_logger() -> Mock:
     """Create a mock logger.
 
-    :return: A mock logger conforming to LoggerContract
+    Returns:
+        A mock logger conforming to LoggerContract
     """
     return Mock(spec=LoggerContract)
