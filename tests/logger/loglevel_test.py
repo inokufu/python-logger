@@ -1,5 +1,6 @@
 import pytest
 
+from src.logger.errors import UnknownLogLevelError
 from src.logger.loglevel import LogLevel
 
 
@@ -29,5 +30,5 @@ class TestLogLevel:
             - The error message contains "Invalid log level" to help with debugging
             - The validation prevents incorrect string values from being accepted
         """
-        with pytest.raises(ValueError, match="Invalid log level"):
+        with pytest.raises(UnknownLogLevelError, match="Invalid log level"):
             LogLevel.from_str("INVALID")

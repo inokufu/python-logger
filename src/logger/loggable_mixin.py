@@ -1,4 +1,5 @@
 from .contract import LoggerContract
+from .errors import LoggerNotSetError
 
 
 class LoggableMixin:
@@ -16,10 +17,10 @@ class LoggableMixin:
             The configured logger instance.
 
         Raises:
-            RuntimeError: If logger has not been set.
+            LoggerNotSetError: If logger has not been set.
         """
         if self._logger is None:
-            raise RuntimeError("Logger not set")
+            raise LoggerNotSetError
         return self._logger
 
     @logger.setter
