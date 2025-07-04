@@ -91,7 +91,8 @@ class TestLoguruLogger:
             - Additional context is preserved
         """
         try:
-            raise ValueError("Sample exception")  # noqa: TRY301
+            msg = "Sample exception"
+            raise ValueError(msg)  # noqa: TRY301
         except ValueError as exc:
             loguru_logger.exception(
                 "An error occurred",

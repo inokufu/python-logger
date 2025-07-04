@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.logger.errors import LoggerNotSetError
 from src.logger.loggable_mixin import LoggableMixin
 
 
@@ -27,7 +28,7 @@ class TestLoggableMixin:
         Args:
             loggable: Fresh LoggableMixin instance without a logger set
         """
-        with pytest.raises(RuntimeError, match="Logger not set"):
+        with pytest.raises(LoggerNotSetError, match="Logger not set"):
             _ = loggable.logger
 
     def test_logger_set(self, loggable: LoggableMixin, mock_logger: Mock) -> None:
