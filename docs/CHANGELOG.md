@@ -17,3 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive test suite for all components
 - Support for structured logging with context information
 - Exception logging with type and message extraction
+
+## [0.2.0] - 2025-07-17
+
+### Changed
+
+- Python version to 3.13
+- Upgrade dependencies
