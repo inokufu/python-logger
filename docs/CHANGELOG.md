@@ -24,3 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python version to 3.13
 - Upgrade dependencies
+
+## [0.3.0] - 2026-01-06
+
+### Changed
+
+- Python version to 3.14
+- Migrated from Rye to uv
+- Type checking with ty
