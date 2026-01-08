@@ -1,5 +1,5 @@
 import io
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from typing import Any
 
 import pytest
@@ -22,7 +22,7 @@ class TestLoguruLogger:
         return LoguruLogger(level=LogLevel.DEBUG)
 
     @pytest.fixture
-    def capture_logs(self) -> io.StringIO:
+    def capture_logs(self) -> Iterator[io.StringIO]:
         """Capture logs output to a string buffer.
 
         Yields:
