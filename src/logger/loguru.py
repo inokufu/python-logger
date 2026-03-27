@@ -45,7 +45,7 @@ class LoguruLogger(LoggerContract):
             message: The message to log.
             context: Additional contextual information to include with the log.
         """
-        log_data = {"message": message}
+        log_data: dict[str, Any] = {"message": message}
         if context:
             log_data["context"] = context
 
