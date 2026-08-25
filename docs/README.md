@@ -56,15 +56,15 @@ logger = LoguruLogger(level=LogLevel.DEBUG)
 logger.info("Application started")
 
 # Logging with context
-logger.debug("Processing item",
-             context={"item_id": "12345", "status": "pending"})
+logger.debug("Processing item", context={"item_id": "12345", "status": "pending"})
 
 # Error logging
 try:
     result = 1 / 0
 except Exception as e:
-    logger.exception("Division error occurred", exc=e,
-                     context={"operation": "division"})
+    logger.exception(
+        "Division error occurred", exc=e, context={"operation": "division"}
+    )
 ```
 
 ### Using the LoggableMixin
