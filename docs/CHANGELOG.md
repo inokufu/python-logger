@@ -3,7 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.5.0] - 2026-10-12
+
+### Changed
+
+- **Breaking:** `LoguruLogger` writes one JSON object per line using Loguru's
+  `serialize` format, without color codes; the context is in
+  `record.extra.context`
+- `file`, `function` and `line` now point to the caller instead of the logger
+- Upgrade dependencies
+
+### Fixed
+
+- Context given as a non-`dict` `Mapping` is serialized as a JSON object
 
 ## [0.4.0] - 2026-08-25
 
@@ -31,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade dependencies
-
 
 ## [0.3.1] - 2026-03-06
 

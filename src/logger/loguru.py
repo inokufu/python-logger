@@ -1,5 +1,5 @@
+import sys
 from collections.abc import Mapping
-from sys import stderr
 from typing import Any, override
 
 from loguru import logger
@@ -24,10 +24,11 @@ class LoguruLogger(LoggerContract):
         self._logger.remove()
 
         self._logger.add(
-            sink=stderr,
+            sink=sys.stderr,
             level=level,
-            format="{time:%Y-%m-%d %H:%M:%S} | <level>{level}</level> | {message}",
-            colorize=True,
+            format="{time:%Y-%m-%d %H:%M:%S} | {level} | {message}",
+            colorize=False,
+            serialize=True,
             backtrace=level == LogLevel.DEBUG,  # Include full stack trace
             diagnose=level == LogLevel.DEBUG,  # Include variables in stack trace
         )
@@ -45,11 +46,10 @@ class LoguruLogger(LoggerContract):
             message: The message to log.
             context: Additional contextual information to include with the log.
         """
-        log_data: dict[str, Any] = {"message": message}
-        if context:
-            log_data["context"] = context
-
-        self._logger.log(level.name, log_data)
+        # depth=2: public methods must call this directly to attribute the caller
+        self._logger.opt(depth=2).bind(
+            context=dict(context) if context is not None else None,
+        ).log(level.name, message)
 
     @override
     def debug(self, message: str, context: Mapping[str, Any] | None = None) -> None:
@@ -89,4 +89,8 @@ class LoguruLogger(LoggerContract):
         if context:
             exc_context.update(context)
 
-        self.error(message=message, context=exc_context)
+        self._log_with_context(
+            level=LogLevel.ERROR,
+            message=message,
+            context=exc_context,
+        )

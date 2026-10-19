@@ -23,7 +23,7 @@ Key features:
 
 - 📏 Standardized logging interface through a contract
 - 🔄 Easy integration into existing classes via a mixin
-- 🌈 Beautiful, colorized console output via Loguru
+- 🗂️ JSON output to stderr, one log record per line
 - 🧩 Structured logging with context support
 - 📊 Granular log level control
 - 🧪 Thoroughly tested implementation
@@ -123,6 +123,14 @@ implementations:
 
 An implementation of `LoggerContract` using
 the [Loguru](https://github.com/Delgan/loguru) library.
+
+It writes to stderr one JSON object per line, following Loguru's
+[`serialize`](https://loguru.readthedocs.io/en/stable/api/logger.html#sink)
+format. The context is in `record.extra.context` :
+
+```json
+{"text": "2026-10-12 16:14:05 | INFO | User profile fetched\n", "record": {"extra": {"context": {"user_id": 42}}, "function": "fetch_profile", "level": {"name": "INFO", "no": 20, ...}, "message": "User profile fetched", "time": {"repr": "2026-10-12 16:14:05.094044+02:00", ...}, ...}}
+```
 
 ### LoggableMixin
 

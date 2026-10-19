@@ -1,5 +1,6 @@
-import io
+import json
 from collections.abc import Iterator, Mapping
+from types import MappingProxyType
 from typing import Any
 
 import pytest
@@ -12,26 +13,14 @@ from src.logger.loguru import LoguruLogger
 class TestLoguruLogger:
     """Test suite for Loguru logger."""
 
-    @pytest.fixture
-    def loguru_logger(self) -> LoguruLogger:
-        """Create a LoguruLogger instance for testing.
-
-        Returns:
-             Configured LoguruLogger instance
-        """
-        return LoguruLogger(level=LogLevel.DEBUG)
-
-    @pytest.fixture
-    def capture_logs(self) -> Iterator[io.StringIO]:
-        """Capture logs output to a string buffer.
+    @pytest.fixture(autouse=True)
+    def remove_handlers(self) -> Iterator[None]:
+        """Detach handlers bound to the test's captured stderr, closed after the test.
 
         Yields:
-            StringIO buffer containing log output
+            Control to the test.
         """
-        log_stream = io.StringIO()
-        logger.remove()
-        logger.add(log_stream, format="{message}")
-        yield log_stream
+        yield
         logger.remove()
 
     @pytest.mark.parametrize(
@@ -42,12 +31,12 @@ class TestLoguruLogger:
             ("warning", "Warning message", {"key": "value"}),
             ("error", "Error message", {"error": "value"}),
             ("critical", "Critical message", None),
+            ("info", "Proxy context", MappingProxyType({"key": "value"})),
         ],
     )
     def test_log_levels(
         self,
-        loguru_logger: LoguruLogger,
-        capture_logs: io.StringIO,
+        capsys: pytest.CaptureFixture[str],
         level: str,
         message: str,
         context: Mapping[str, Any] | None,
@@ -55,33 +44,30 @@ class TestLoguruLogger:
         """Test all logging levels with various message/context combinations.
 
         Args:
-            loguru_logger: Logger instance
-            capture_logs: String buffer capturing log output
+            capsys: Captured stderr
             level: Log level to test
             message: Message to log
             context: Optional context dictionary
         """
         # Get logging method dynamically
-        log_method = getattr(loguru_logger, level)
+        log_method = getattr(LoguruLogger(level=LogLevel.DEBUG), level)
 
         # Log with or without context
         log_method(message, context=context)
 
         # Get logged output
-        logs = capture_logs.getvalue()
+        log = json.loads(capsys.readouterr().err)
+        record = log["record"]
 
-        # Verify message is present
-        assert message in logs
-
-        # Verify context if provided
-        if context:
-            for key, value in context.items():
-                assert f"'{key}': '{value}'" in logs
+        assert "\x1b" not in log["text"]
+        assert record["level"]["name"] == level.upper()
+        assert record["message"] == message
+        assert record["extra"]["context"] == context
+        assert record["function"] == "test_log_levels"
 
     def test_exception_log(
         self,
-        loguru_logger: LoguruLogger,
-        capture_logs: io.StringIO,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test exception logging with context.
 
@@ -94,20 +80,24 @@ class TestLoguruLogger:
             msg = "Sample exception"
             raise ValueError(msg)  # noqa: TRY301
         except ValueError as exc:
-            loguru_logger.exception(
+            LoguruLogger(level=LogLevel.DEBUG).exception(
                 "An error occurred",
                 exc=exc,
                 context={"additional": "info"},
             )
 
-        logs = capture_logs.getvalue()
-        assert (
-            logs.strip()
-            == "{'message': 'An error occurred', 'context': {'exception_type': 'ValueError', 'exception_message': 'Sample exception', 'additional': 'info'}}"  # noqa: E501
-        )
+        record = json.loads(capsys.readouterr().err)["record"]
+        assert record["message"] == "An error occurred"
+        assert record["level"]["name"] == "ERROR"
+        assert record["function"] == "test_exception_log"
+        assert record["extra"]["context"] == {
+            "exception_type": "ValueError",
+            "exception_message": "Sample exception",
+            "additional": "info",
+        }
 
-    def test_logger_level_change(self, capture_logs: io.StringIO) -> None:
+    def test_logger_level_change(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test that debug messages are not logged at INFO level."""
         logger_info = LoguruLogger(level=LogLevel.INFO)
         logger_info.debug("This should not appear")
-        assert not capture_logs.getvalue()
+        assert not capsys.readouterr().err
